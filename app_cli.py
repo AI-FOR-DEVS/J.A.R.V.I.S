@@ -7,6 +7,7 @@ import simpleaudio as sa
 from speech2text import speech2text
 from text2speech import text2speech
 from groq_service import execute
+from gmail_service import fetch_mails
 
 # Audio parameters
 FORMAT = pyaudio.paInt16
@@ -88,7 +89,23 @@ def process_audio(audio_path):
     """Process the audio file."""
     text = speech2text(audio_path)
     print(f"Recognized Text: {text}")
+
     generated_answer = execute(f"Please answer to the question: {text}")
+
+    if "fetch_emails" in generated_answer:
+        print("Call fetch mails")
+        emails = fetch_mails()
+        prompt = f"""
+            Answer the users question: '{text}'. Don't call the fetch_mails.
+            All Emails in Inbox:
+            ---
+            {emails}
+            ---
+        """
+
+        generated_answer = execute(prompt)
+        
+
     print(f"Generated Answer: {generated_answer}")
     # This function needs to return the path of the generated audio file
     generated_speech_path = text2speech(generated_answer)

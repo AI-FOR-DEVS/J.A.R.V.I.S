@@ -5,7 +5,7 @@ client = Groq()
 
 def execute(prompt):
     completion = client.chat.completions.create(
-        model="llama2-70b-4096",
+        model="mixtral-8x7b-32768",
         messages=[
             {
                 "role": "user",
@@ -13,7 +13,17 @@ def execute(prompt):
             },
             {
                 "role": "system",
-                "content": "Provide a concise, one-sentence answer without unnecessary details."
+                "content": """
+                    Strict adherence to these guidelines is crucial. Answer with maximal 1-2 sentences. 
+                    When a request involves email-related tasks, you must invoke the 'fetch_emails' function.  
+                    Don't invoke the methods if emails are already provided.
+                    This action should be performed by returning the following structured command:
+                    {
+                        \"tool_calls\": [{\"name\": \"fetch_emails\"}]
+                    }
+                    Ensure that your response consists solely of this function call format, 
+                    without any additional content, to facilitate accurate interpretation and execution.
+                """
             },
         ],
         temperature=0.5,
